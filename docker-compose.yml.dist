@@ -1,0 +1,65 @@
+version: "2"
+
+services:
+  php:
+    image: "jpcandioti/magento2-multisite:latest"
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - 80
+      - 443
+    depends_on:
+      - mysql
+    volumes:
+      - "./letsencrypt:/etc/letsencrypt"
+      - "./httpd/sites-available:/etc/apache2/sites-available"
+      - "./httpd/sites-enabled:/etc/apache2/sites-enabled"
+      - "./php/php.ini:/usr/local/etc/php/php.ini"
+      - "./sites:/var/www/magento2"
+    environment:
+      - XDEBUG_CONFIG=remote_host=10.10.0.1
+      - PHP_IDE_CONFIG=serverName=magento2
+    networks:
+      m2_net:
+        ipv4_address: 10.10.0.2
+
+  mysql:
+    image: "mysql/mysql-server:5.7"
+    expose:
+      - 3306
+    volumes:
+      - "./mysql_db_files:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secretpass
+      - MYSQL_ROOT_HOST=10.10.%
+    networks:
+      m2_net:
+        ipv4_address: 10.10.0.3
+
+  varnish:
+    image: eeacms/varnish
+    expose:
+      - 80
+      - 6085
+    depends_on:
+      - php
+    environment:
+      BACKENDS: "php"
+      BACKENDS_PORT: 80
+      DNS_ENABLED: "true"
+      BACKENDS_PROBE_INTERVAL: "3s"
+      BACKENDS_PROBE_TIMEOUT: "1s"
+      BACKENDS_PROBE_WINDOW: "3"
+      BACKENDS_PROBE_THRESHOLD: "2"
+    networks:
+      m2_net:
+        ipv4_address: 10.10.0.4
+
+networks:
+  m2_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/16
+          gateway: 10.10.0.1

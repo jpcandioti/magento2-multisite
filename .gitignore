@@ -1,0 +1,17 @@
+/httpd/sites-available/*
+!/httpd/sites-available/example.develop.conf
+/httpd/sites-enabled/*
+!/httpd/sites-enabled/.gitkeep
+
+/letsencrypt/*
+!/letsencrypt/.gitkeep
+
+/mysql_db_files/*
+!/mysql_db_files/.gitkeep
+
+/php/php.ini
+
+/sites/*
+!/sites/.gitkeep
+
+docker-compose.yml

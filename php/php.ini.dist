@@ -1,0 +1,6 @@
+memory_limit = 2G
+
+xdebug.remote_enable = Off
+xdebug.remote_autostart = Off
+xdebug.remote_host = 10.10.0.1
+xdebug.idekey = magento2
